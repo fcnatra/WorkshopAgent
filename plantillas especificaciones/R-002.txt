@@ -1,0 +1,10 @@
+App de control de gastos
+
+Queremos una aplicación móvil para que la gente lleve el control de sus
+gastos y sepa cuánto gasta al mes.
+
+La app debe tener notificaciones para avisar al usuario cuando gasta
+demasiado. También estaría bien algún tipo de informe o resumen, y quizás
+categorías para organizar los gastos.
+
+Debería sincronizar con el banco si es posible.

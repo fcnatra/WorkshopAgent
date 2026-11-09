@@ -1,0 +1,11 @@
+Portal del empleado
+
+Necesitamos un portal donde los empleados soliciten sus vacaciones y
+vean sus datos.
+
+Los empleados deben poder solicitar vacaciones en cualquier momento y
+el jefe las aprueba o rechaza, pero también debería aprobarlas
+automáticamente si hay plaza. El saldo de días hay que mostrarlo en
+algún sitio. Los administradores tienen acceso a todo.
+
+Es urgente.

@@ -1,0 +1,18 @@
+Sistema de reserva de salas de reuniones
+
+Queremos una aplicación web donde los empleados de la oficina puedan
+reservar salas de reuniones.
+
+Funcionalidad:
+- El empleado ve un listado de salas con su capacidad y equipamiento
+  (TV, videollamada, pizarra).
+- El empleado selecciona una sala, una fecha, una hora de inicio y una
+  duración (30 min, 1 h o 2 h).
+- Si la sala ya está ocupada en ese tramo, el sistema muestra las salas
+  alternativas disponibles a esa misma hora.
+- La reserva queda a nombre del empleado y recibe un email de confirmación.
+- El empleado puede cancelar su reserva hasta 1 hora antes del inicio.
+
+Reglas:
+- Solo se puede reservar en horario laboral (8:00 - 20:00, lunes a viernes).
+- Cada empleado puede tener un máximo de 2 reservas activas a la vez.
