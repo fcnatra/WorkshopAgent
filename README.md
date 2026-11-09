@@ -41,8 +41,8 @@ flowchart LR
 Antes del workshop, ten listo:
 
 1. **Python 3.10+** — `winget install Python.Python.3.13` (o desde [python.org](https://python.org))
-	- En Windows Powershell: winget install Python.Python.3.13
-	- Si en la ejecución del ejemplo con API_REST hay error de certificado, usa: pip install pip-system-certs
+	- En Windows Powershell:
+		-> winget install Python.Python.3.13
 2. **API key gratis de Google AI Studio** (2 minutos, sin tarjeta):
    - Entra en [aistudio.google.com](https://aistudio.google.com) con tu cuenta Google
    - Menú lateral → **Get API key** → **Create API key**
@@ -98,3 +98,18 @@ python Refinador.py
 ---
 
 *¿Siguiente parada? El agente planificador.* 🏭
+
+## POSIBLES ERRORES
+
+- Si en la ejecución del ejemplo con API_REST hay error de certificado, usa:
+	-> pip install pip-system-certs
+
+- Si hay un error estilo:
+	ERRORES:
+		- RecursionError: maximum recursion depth exceeded
+		- _original_super_SSLContext.verify_mode.__set__(ssl_context, verify_mode) 
+	SOLUCIÓN:
+		-> python.exe -m pip install --upgrade pip
+		-> py -3.13 -m pip install --upgrade google-genai
+		-> py -3.13 -m pip install "google-genai[httpx]"
+		-> $env:GOOGLE_GENAI_HTTP_CLIENT="httpx"
