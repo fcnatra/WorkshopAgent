@@ -23,13 +23,14 @@ flowchart LR
 ### Cuando se usa el bucle agéntico el ciclo sería este:
 
 ```mermaid
-flowchart TD
+flowchart LR
     A["📂 R-*.txt (requisitos)"] --> B["🤖 Agente lee el archivo"]
     B --> C["🧠 Llamada al LLM\n(prompt + contenido)"]
     C --> D{"El LLM quiere\nusar la tool?"}
-    D -->|Sí, la invoca| B["🔧 obtener_guia_historias()\n"]
-    E --> F{"Requisitos\nclaros?"}
-    F -->|No| G
+    D -->|Sí, la invoca| E["🔧 obtener_guia_historias()\n(devuelve GUIA_HISTORIAS)"]
+    E --> F["🔄 El SDK envía el resultado\nde vuelta al LLM"]
+    F --> G{"Requisitos\nclaros?"}
+    D -->|No| G
     G -->|"refinar"| H["❓ Preguntas añadidas\nal final del propio R-*.txt"]
     G -->|"generar"| I["✅ US-001.txt, US-002.txt...\nhistorias de usuario"]
     H -. "cliente responde en el archivo" .-> B
