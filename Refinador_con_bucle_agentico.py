@@ -106,8 +106,8 @@ def obtener_guia_historias() -> str:
     Úsala cuando vayas a redactar historias de usuario y quieras
     comprobar las reglas de calidad (formato, criterios, tamaño).
     """
-   print(f"El LLM ha pedido la guía de historias de usuario")
-   return GUIA_HISTORIAS
+    print(f"El LLM ha pedido la guía de historias de usuario")
+    return GUIA_HISTORIAS
 
 # ---------------------------------------------------------------------------
 # Conexión con el LLM

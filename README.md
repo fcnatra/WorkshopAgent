@@ -42,6 +42,7 @@ Antes del workshop, ten listo:
 
 1. **Python 3.10+** — `winget install Python.Python.3.13` (o desde [python.org](https://python.org))
 	- En Windows Powershell: winget install Python.Python.3.13
+	- Si en la ejecución del ejemplo con API_REST hay error de certificado, usa: pip install pip-system-certs
 2. **API key gratis de Google AI Studio** (2 minutos, sin tarjeta):
    - Entra en [aistudio.google.com](https://aistudio.google.com) con tu cuenta Google
    - Menú lateral → **Get API key** → **Create API key**
