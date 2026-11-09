@@ -21,6 +21,7 @@ flowchart LR
 ```
 
 ### Cuando se usa el bucle agéntico el ciclo sería este:
+```mermaid
 flowchart TD
     A["📂 R-*.txt (requisitos)"] --> B["🤖 Agente lee el archivo"]
     B --> C["🧠 Llamada al LLM\n(prompt + contenido)"]
