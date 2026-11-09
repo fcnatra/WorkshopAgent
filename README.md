@@ -27,7 +27,7 @@ flowchart TD
     A["📂 R-*.txt (requisitos)"] --> B["🤖 Agente lee el archivo"]
     B --> C["🧠 Llamada al LLM\n(prompt + contenido)"]
     C --> D{"El LLM quiere\nusar la tool?"}
-    D -->|Sí, la invoca| E["🔧 obtener_guia_historias()\n(devuelve GUIA_HISTORIAS)"]
+    D -->|Sí, la invoca| B["🔧 obtener_guia_historias()\n"]
     E --> F["🔄 El SDK envía el resultado\nde vuelta al LLM"]
     F --> G{"Requisitos\nclaros?"}
     D -->|No| G
