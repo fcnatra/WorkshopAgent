@@ -153,26 +153,30 @@ def leer_api_key() -> str:
 
 
 def llamar_api(api_key: str, contents: list[dict]) -> dict:
-    """Una única petición HTTP a generateContent. Devuelve el JSON de la respuesta.
-
-    La API no guarda estado: `contents` debe llevar TODO el historial.
-    Reintenta con espera creciente ante errores temporales.
-    """
     cuerpo = {
         "systemInstruction": {"parts": [{"text": PROMPT_SISTEMA}]},
         "contents": contents,
         "tools": DECLARACION_TOOLS,
-        "generationConfig": {"responseMimeType": "application/json"},  # JSON mode
+        "generationConfig": {"responseMimeType": "application/json"},
     }
     url = API_URL.format(modelo=MODELO)
 
     for intento in range(1, MAX_REINTENTOS + 1):
-        r = requests.post(
-            url,
-            headers={"x-goog-api-key": api_key},
-            json=cuerpo,
-            timeout=60,
-        )
+        try:
+            r = requests.post(
+                url,
+                headers={"x-goog-api-key": api_key},
+                json=cuerpo,
+                timeout=(10, 180),   # (conexión, lectura): el modelo puede tardar
+            )
+        except requests.exceptions.RequestException as e:
+            if intento == MAX_REINTENTOS:
+                raise
+            espera = 2 ** intento
+            print(f"  (error de red: {type(e).__name__}, reintento en {espera}s)")
+            time.sleep(espera)
+            continue
+
         if r.status_code in (429, 500, 503) and intento < MAX_REINTENTOS:
             espera = 2 ** intento
             print(f"  (HTTP {r.status_code}, reintento en {espera}s)")
@@ -183,7 +187,6 @@ def llamar_api(api_key: str, contents: list[dict]) -> dict:
         return r.json()
 
     raise RuntimeError("No se pudo completar la petición a la API")
-
 
 def consultar_llm_con_tool(api_key: str, archivo: str, contenido: str) -> dict:
     """EL BUCLE AGÉNTICO, escrito a mano.
