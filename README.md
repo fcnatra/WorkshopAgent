@@ -92,9 +92,8 @@ python Refinador.py
 | Hora | Sesión |
 |---|---|
 | 0:00 – 0:30 | Intro: agentes especializados en el ciclo de vida software |
-| 0:30 – 1:30 | 💻 Hands-on: construyendo el agente |
-| 1:30 – 2:00 | Demos: refinar vs generar, el ciclo iterativo |
-| 2:00 – 2:30 | Conclusiones y siguientes agentes de la factoría |
+| 0:30 – 1:30 | 💻 Hands-on: probar las versiones, ciclo iterativo |
+| 1:30 – 2:00 | Conclusiones y siguientes agentes de la factoría |
 
 ---
 
