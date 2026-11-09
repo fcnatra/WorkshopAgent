@@ -29,7 +29,7 @@ flowchart TD
     C --> D{"El LLM quiere\nusar la tool?"}
     D -->|Sí, la invoca| B["🔧 obtener_guia_historias()\n"]
     E --> F{"Requisitos\nclaros?"}
-    F -->|No| H
+    F -->|No| G
     G -->|"refinar"| H["❓ Preguntas añadidas\nal final del propio R-*.txt"]
     G -->|"generar"| I["✅ US-001.txt, US-002.txt...\nhistorias de usuario"]
     H -. "cliente responde en el archivo" .-> B
