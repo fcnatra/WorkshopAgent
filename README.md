@@ -34,6 +34,7 @@ flowchart TD
     G -->|"refinar"| H["❓ Preguntas añadidas\nal final del propio R-*.txt"]
     G -->|"generar"| I["✅ US-001.txt, US-002.txt...\nhistorias de usuario"]
     H -. "cliente responde en el archivo" .-> B
+```
 
 ## 🛠️ Requisitos previos
 
