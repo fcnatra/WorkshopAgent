@@ -49,7 +49,7 @@ import requests
 # ---------------------------------------------------------------------------
 
 CARPETA_VIGILADA = "especificaciones"   # carpeta con los R-*.txt
-MODELO = "gemini-3.8-flash"             # mismo modelo que las versiones con SDK
+MODELO = "gemini-3.8-flash"             # mismo modelo que las versiones con SDK - si hay saturación, probar gemini-3.7-flash
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent"
 
 MAX_LLAMADAS = 10    # tope de vueltas del bucle agéntico (el SDK usa 10 por defecto)
