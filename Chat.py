@@ -86,7 +86,7 @@ def consultar_llm(cliente: genai.Client, contenido: str) -> str:
     
     respuesta_texto=""
 
-    print(f"Consultado el LLM")
+    print(f"Consultando el LLM")
     try:
         respuesta = cliente.models.generate_content(
             model=MODELO,
