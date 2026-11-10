@@ -105,11 +105,11 @@ python Refinador.py
 	-> pip install pip-system-certs
 
 - Si hay un error estilo:
-	ERRORES:
-		- RecursionError: maximum recursion depth exceeded
-		- _original_super_SSLContext.verify_mode.__set__(ssl_context, verify_mode) 
-	SOLUCIÓN:
-		-> python.exe -m pip install --upgrade pip
-		-> py -3.13 -m pip install --upgrade google-genai
-		-> py -3.13 -m pip install "google-genai[httpx]"
+	ERRORES:\
+		- RecursionError: maximum recursion depth exceeded\
+		- _original_super_SSLContext.verify_mode.__set__(ssl_context, verify_mode)\
+	SOLUCIÓN:\
+		-> python.exe -m pip install --upgrade pip\
+		-> py -3.13 -m pip install --upgrade google-genai\
+		-> py -3.13 -m pip install "google-genai[httpx]"\
 		-> $env:GOOGLE_GENAI_HTTP_CLIENT="httpx"
