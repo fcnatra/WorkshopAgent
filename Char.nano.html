@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat con Gemini Nano (Chrome)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, sans-serif; background: #f4f5f7; color: #1f2937; }
+    * { box-sizing: border-box; }
+    body { margin: 0; display: flex; flex-direction: column; height: 100vh; }
+    header { background: #1a73e8; color: #fff; padding: 14px 20px; }
+    header h1 { margin: 0; font-size: 18px; }
+    header p { margin: 4px 0 0; font-size: 12px; opacity: 0.85; }
+    #status { padding: 8px 20px; font-size: 13px; background: #fef3c7; }
+    #status.ok { background: #dcfce7; }
+    #status.err { background: #fee2e2; }
+    #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; font-size: 14px; line-height: 1.45; }
+    .user { align-self: flex-end; background: #1a73e8; color: #fff; border-bottom-right-radius: 3px; }
+    .bot { align-self: flex-start; background: #fff; border: 1px solid #e5e7eb; border-bottom-left-radius: 3px; }
+    .sys { align-self: center; font-size: 12px; color: #9ca3af; }
+    footer { display: flex; gap: 8px; padding: 12px 20px; background: #fff; border-top: 1px solid #e5e7eb; }
+    #input { flex: 1; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+    button { padding: 10px 18px; border: none; border-radius: 8px; background: #1a73e8; color: #fff; font-size: 14px; cursor: pointer; }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .hint { font-size: 11px; color: #6b7280; padding: 0 20px 10px; background: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🤖 Chat con Gemini Nano — LLM local de Chrome</h1>
+    <p>Chat agent — sin API key, sin servidor: el modelo corre en tu navegador</p>
+  </header>
+  <div id="status">Comprobando el modelo local…</div>
+  <div id="chat"></div>
+  <div class="hint">Escribe y pulsa Enter (o el botón). El "." a solas termina. El asistente habla como Yoda. 🍀</div>
+  <footer>
+    <input id="input" placeholder="TU TURNO >" autocomplete="off" />
+    <button id="send">Enviar</button>
+  </footer>
+
+  <script>
+    // =========================================================================
+    // Prompt API de Chrome (Gemini Nano). Equivalencias con Chat.py:
+    //   crear_cliente()      -> LanguageModel.create(...)  (lo hace el navegador)
+    //   consultar_llm()      -> session.prompt(...) / session.promptStreaming(...)
+    //   buffer "contenido"   -> la propia sesión guarda el historial
+    //   PROMPT_SISTEMA       -> systemPrompt al crear la sesión
+    // =========================================================================
+
+    const PROMPT_SISTEMA = `
+Eres un asistente conversacional útil, inteligente y colaborativo, pero no complaciente,
+porque las personas no siempre tienen la razón.
+
+Tu objetivo es entretener en forma de conversación con la estructura que usaba Yoda
+para conversar, sí, el de la guerra de las galaxias.
+
+- Comprende el contexto y ten en cuenta los mensajes anteriores.
+- Responde de forma clara y directa, con mensajes cortos.
+- Si falta información importante, pregunta antes de asumir.
+- Si no sabes algo, reconócelo. No inventes información.
+- Si hay algún proverbio que encaje con tu frase, úsalo.
+
+Tu prioridad es entretener.`;
+
+    const chatEl = document.getElementById("chat");
+    const statusEl = document.getElementById("status");
+    const inputEl = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+
+    let session = null;
+    let busy = false;
+
+    function addMsg(text, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.textContent = text;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      return div;
+    }
+
+    function setStatus(text, cls) {
+      statusEl.textContent = text;
+      statusEl.className = cls || "";
+    }
+
+    // --- "crear_cliente": comprobar y crear la sesión con el modelo local ---
+    async function iniciarSesion() {
+      // 1. ¿Existe la API en este navegador?
+      if (typeof LanguageModel === "undefined") {
+        setStatus("❌ Este navegador no tiene la Prompt API. Necesitas Chrome 138+ " +
+          "y activar la IA integrada en chrome://settings/ai", "err");
+        sendBtn.disabled = true; inputEl.disabled = true;
+        return;
+      }
+      // 2. ¿Está el modelo disponible en este dispositivo?
+      const disp = await LanguageModel.availability();
+      if (disp === "unavailable") {
+        setStatus("❌ Gemini Nano no está disponible en este dispositivo (falta hardware/memoria).", "err");
+        sendBtn.disabled = true; inputEl.disabled = true;
+        return;
+      }
+      // 3. Crear la sesión (requiere gesto del usuario la 1ª vez: por eso se
+      //    hace dentro del clic de "Enviar", no al cargar la página).
+      if (disp === "downloadable") {
+        setStatus("⏬ Modelo no descargado aún — escribe algo y pulsa Enviar para iniciarlo (~4 GB, solo la primera vez)…", "");
+		return;
+      }
+      if (disp === "downloading") {
+        setStatus("⏳ El modelo se está descargando… prueba de nuevo en un rato.", "");
+        sendBtn.disabled = true; inputEl.disabled = true;
+        return;
+      }
+	  setStatus("✅ Gemini Nano listo (modelo local, sin API key)", "ok");
+    }
+
+    async function obtenerSesion() {
+      if (session) return session;
+      session = await LanguageModel.create({
+        systemPrompt: PROMPT_SISTEMA,
+        temperature: 0.7,
+        topK: 5,
+        monitor(m) {
+          m.addEventListener("downloadprogress", (e) => {
+            setStatus("⏬ Descargando el modelo: " + (e.loaded * 100).toFixed(0) + "%", "");
+          });
+        },
+      });
+      setStatus("✅ Gemini Nano listo (modelo local, sin API key)", "ok");
+      addMsg("— sesión iniciada: la conversación vive en la sesión del navegador —", "sys");
+      return session;
+    }
+
+    // --- "consultar_llm": enviar el turno y pintar la respuesta en streaming ---
+    async function enviar() {
+      const texto = inputEl.value.trim();
+      if (!texto || busy) return;
+      if (texto === ".") { addMsg("— fin —", "sys"); sendBtn.disabled = true; inputEl.disabled = true; return; }
+
+      busy = true; sendBtn.disabled = true;
+      inputEl.value = "";
+      addMsg(texto, "user");
+
+      try {
+        const s = await obtenerSesion(); // la sesión mantiene (acumula) la conversación por sí misma (sesión = contexto, herramientas)
+        const burbuja = addMsg("", "bot");
+        setStatus("Consultando al LLM local…", "");
+        // Streaming: los chunks son incrementales (delta), hay que concatenar
+        for await (const chunk of s.promptStreaming(texto)) {
+          burbuja.textContent += chunk;
+          chatEl.scrollTop = chatEl.scrollHeight;
+        }
+        setStatus("✅ Listo", "ok");
+      } catch (e) {
+        addMsg("¡Error al consultar el LLM!: " + (e && e.message ? e.message : e), "bot");
+        setStatus("Error: " + (e && e.message ? e.message : e), "err");
+        // La conversación no se ve afectada.
+        if (session) { try { session.destroy(); } catch (_) {} session = null; }
+      } finally {
+        busy = false; sendBtn.disabled = false; inputEl.focus();
+      }
+    }
+	
+	// MAIN - START OF THE PROGRAM
+
+    sendBtn.addEventListener("click", enviar);
+    inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") enviar(); });
+
+    // Comprobación inicial (sin crear sesión: eso requiere clic del usuario)
+    iniciarSesion();
+  </script>
+</body>
+</html>
